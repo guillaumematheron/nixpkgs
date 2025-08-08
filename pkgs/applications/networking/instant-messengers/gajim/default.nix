@@ -35,39 +35,41 @@
   gupnp-igd,
   enableAppIndicator ? true,
   libappindicator-gtk3,
+  enableSoundNotifications ? true,
+  gsound,
   extraPythonPackages ? ps: [ ],
 }:
 
 python3.pkgs.buildPythonApplication rec {
   pname = "gajim";
-  version = "2.0.3";
+  version = "2.2.0";
 
   src = fetchurl {
     url = "https://gajim.org/downloads/${lib.versions.majorMinor version}/gajim-${version}.tar.gz";
-    hash = "sha256-DbM80fyJ+jwB9Yc9vfoiDqW7Sx7MDR0OEkHdOC6nRG4=";
+    hash = "sha256-TOZuMiE5RjaJYvNWxl2FyCp6uIO+LLWiRb7N9jc1yRk=";
   };
 
   format = "pyproject";
 
-  buildInputs =
-    [
-      gtk4
-      adwaita-icon-theme
-      gtksourceview5
-      glib-networking
-    ]
-    ++ lib.optionals enableJingle [
-      farstream
-      gstreamer
-      gst-plugins-base
-      gst-libav
-      gst-plugins-good
-      libnice
-    ]
-    ++ lib.optional enableSecrets libsecret
-    ++ lib.optional enableSpelling gspell
-    ++ lib.optional enableUPnP gupnp-igd
-    ++ lib.optional enableAppIndicator libappindicator-gtk3;
+  buildInputs = [
+    gtk4
+    adwaita-icon-theme
+    gtksourceview5
+    glib-networking
+  ]
+  ++ lib.optionals enableJingle [
+    farstream
+    gstreamer
+    gst-plugins-base
+    gst-libav
+    gst-plugins-good
+    libnice
+  ]
+  ++ lib.optional enableSecrets libsecret
+  ++ lib.optional enableSpelling gspell
+  ++ lib.optional enableUPnP gupnp-igd
+  ++ lib.optional enableAppIndicator libappindicator-gtk3
+  ++ lib.optional enableSoundNotifications gsound;
 
   nativeBuildInputs = [
     gettext
@@ -139,6 +141,7 @@ python3.pkgs.buildPythonApplication rec {
     maintainers = with lib.maintainers; [
       raskin
       abbradar
+      hlad
     ];
     downloadPage = "http://gajim.org/download/";
     platforms = lib.platforms.linux;
