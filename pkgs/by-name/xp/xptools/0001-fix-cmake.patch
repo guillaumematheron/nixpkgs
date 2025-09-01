@@ -1,0 +1,77 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index e8adaea12..d9d57f32d 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -10,18 +10,22 @@ endif()
+ set(CMAKE_CXX_STANDARD 20)
+ set(CMAKE_CXX_STANDARD_REQUIRED ON)
+ 
++find_package(opengl REQUIRED)
+ find_package(expat REQUIRED)
+-find_package(proj REQUIRED)
+-find_package(freetype REQUIRED)
++find_package(PROJ REQUIRED)
++find_package(Freetype REQUIRED)
+ find_package(ZLIB REQUIRED)
+ find_package(PNG REQUIRED)
+ find_package(TIFF REQUIRED)
+-find_package(geotiff REQUIRED)
++find_package(GeoTIFF REQUIRED)
+ find_package(JPEG REQUIRED)
+ find_package(libsquish REQUIRED)
+ find_package(shapelib REQUIRED)
+ find_package(CURL REQUIRED)
+-find_package(opengl_system REQUIRED)
++
++find_package(OpenGL REQUIRED)
++find_package(glu REQUIRED)
++
+ find_package(glew REQUIRED)
+ find_package(jsoncpp REQUIRED)
+ 
+diff --git a/cmake/ObjView.cmake b/cmake/ObjView.cmake
+index 0f323b7c8..e7dac98b8 100644
+--- a/cmake/ObjView.cmake
++++ b/cmake/ObjView.cmake
+@@ -87,5 +87,5 @@ if (APPLE)
+ 		${APPKIT_FRAMEWORK}
+ 	)
+ elseif(LINUX)
+-	target_link_libraries(ObjView PRIVATE fltk::fltk egl::egl)
++	target_link_libraries(ObjView PRIVATE fltk::fltk egl::egl fltk::gl)
+ endif()
+diff --git a/cmake/WED.cmake b/cmake/WED.cmake
+index 17400122a..e2194d296 100644
+--- a/cmake/WED.cmake
++++ b/cmake/WED.cmake
+@@ -520,7 +520,7 @@ target_link_libraries(WED PRIVATE
+ 	PROJ::proj
+ 	Freetype::Freetype
+ 	TIFF::TIFF
+-	geotiff_library
++	GeoTIFF::GeoTIFF
+ 	JPEG::JPEG
+ 	libsquish::libsquish
+ 	CURL::libcurl
+@@ -571,6 +571,6 @@ elseif (LINUX)
+ 		embed_resource(WED ${res})
+ 	endforeach()
+ 
+-	target_link_libraries(WED PRIVATE fltk::fltk egl::egl)
++	target_link_libraries(WED PRIVATE fltk::fltk egl::egl fltk::gl)
+ 	target_link_options(WED PRIVATE -rdynamic)
+ endif()
+diff --git a/src/WEDCore/WED_PackageMgr.cpp b/src/WEDCore/WED_PackageMgr.cpp
+index 469b9c94e..4273ed537 100644
+--- a/src/WEDCore/WED_PackageMgr.cpp
++++ b/src/WEDCore/WED_PackageMgr.cpp
+@@ -166,6 +166,9 @@ void		WED_PackageMgr::GetNthPackageName(int n, string& package) const
+ 	if (n < global_packages.size())	{ package = global_packages[n].name; return; }
+ 	n -= global_packages.size();
+ 
++    if (n <= default_packages.size())
++        return;
++
+ 	package = default_packages[n].name;
+ }
+ 
